@@ -21,7 +21,8 @@ zaps/<zap>/
 ├── workflow.ts      the Zap's code
 ├── config.ts        its settings; each "REPLACE_…" value is set per person
 ├── connections/     one file per account it uses
-└── triggers/        what starts it
+├── triggers/        what starts it
+└── lib/             optional helpers workflow.ts imports
 ```
 
 ## Layout

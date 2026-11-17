@@ -6,16 +6,16 @@ This repo holds Zaps written as code. This file holds the rules for working here
 
 ## Where to work
 
-| Path                 | What lives here                                                                           |
-| -------------------- | ----------------------------------------------------------------------------------------- |
-| `zaps/<zap>/`        | One zap: `workflow.ts`, `config.ts`, `connections/`, `triggers/`, `SKILL.md`, `README.md` |
-| `scripts/`           | The `zap:deploy` and `zap:status` scripts, and the zap catalog test                       |
-| `skills/`            | Skills for working on zaps, such as `create-zap-template`                                 |
-| `docs/TESTING.md`    | How to test a zap against Zapier                                                          |
-| `docs/DEPLOY.md`     | What to expect when deploying a zap                                                       |
-| `eslint.config.js`   | ESLint rules                                                                              |
-| `.fallowrc.jsonc`    | Fallow entry points and settings                                                          |
-| `.github/workflows/` | CI                                                                                        |
+| Path                 | What lives here                                                                                   |
+| -------------------- | ------------------------------------------------------------------------------------------------- |
+| `zaps/<zap>/`        | One zap: `workflow.ts`, `config.ts`, `connections/`, `triggers/`, `lib/`, `SKILL.md`, `README.md` |
+| `scripts/`           | The `zap:deploy` and `zap:status` scripts, and the zap catalog test                               |
+| `skills/`            | Skills for working on zaps, such as `create-zap-template`                                         |
+| `docs/TESTING.md`    | How to test a zap against Zapier                                                                  |
+| `docs/DEPLOY.md`     | What to expect when deploying a zap                                                               |
+| `eslint.config.js`   | ESLint rules                                                                                      |
+| `.fallowrc.jsonc`    | Fallow entry points and settings                                                                  |
+| `.github/workflows/` | CI                                                                                                |
 
 ## Commands
 
@@ -58,7 +58,8 @@ Everything else is in the root `package.json`. The repo root is a zap-pack proje
 ### Workflows
 
 - **A zap is its folder of plain files, with no zap-pack imports.** An agent builds it with Zapier MCP by following its `SKILL.md`, so every file must read correctly as committed. Types, lint and fallow skip zap folders, and `scripts/catalog.test.ts` checks them instead.
-  - `workflow.ts` imports nothing but `@zapier/zapier-durable`, `@zapier/zapier-sdk`, `zod` and `./config.ts`, and names each account by its alias as a string (`connection: "slack"`).
+  - `workflow.ts` imports nothing but `@zapier/zapier-durable`, `@zapier/zapier-sdk`, `zod`, `./config.ts` and helpers in `./lib/`, and names each account by its alias as a string (`connection: "slack"`).
+  - `lib/` is optional: pure helpers `workflow.ts` imports as `./lib/<name>.ts`, with no SDK calls and no side effects. They're published with `workflow.ts`, so the zap's `SKILL.md` lists them in its build steps.
   - Each alias is a file in `connections/` whose default export is `{ app, description }`. The description says what the account must be able to do.
   - `triggers/` holds what starts it, as a plain object: `app`, `event`, `connection` (the alias) and `params`.
   - Every file names apps by slug (`slack`, `google-sheets`), never by implementation key. The agent resolves a trigger's full app ID from the slug when it builds, as each `SKILL.md` says.

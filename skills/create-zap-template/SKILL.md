@@ -1,6 +1,6 @@
 ---
 name: create-zap-template
-description: Use when the user asks to turn a zapier.com automation page, or a Zap they already run, into a Zap template for github.com/zapier/awesome-zaps, or to "make a template out of" a Zap or recipe. Writes one plain-file zap folder (workflow.ts, config.ts, connections/, triggers/, SKILL.md, README.md), tests it with a Zapier MCP draft run without turning it on, and hands back the folder for a pull request.
+description: Use when the user asks to turn a zapier.com automation page, or a Zap they already run, into a Zap template for github.com/zapier/awesome-zaps, or to "make a template out of" a Zap or recipe. Writes one plain-file zap folder (workflow.ts, config.ts, connections/, triggers/, optional lib/, SKILL.md, README.md), tests it with a Zapier MCP draft run without turning it on, and hands back the folder for a pull request.
 license: MIT
 metadata:
   author: zapier
@@ -37,10 +37,11 @@ If an app has no connection, write the zap anyway and report it as built but not
 
 Write it to `zaps/<slug>/`, in the same shape as the examples, following `AGENTS.md`. The points agents most often get wrong:
 
-- **`workflow.ts`:** `defineDurable("<slug>", …)` with the folder name. It imports only `@zapier/zapier-durable`, `@zapier/zapier-sdk`, `zod` and `./config.ts`. Name each account by its alias as a string (`connection: "google-sheets"`). Keep `appKey`, `actionType` and `actionKey` string literals; Zapier's publish check rejects anything else. Check each action's keys and fields with `inspect_zapier_actions` before writing them.
+- **`workflow.ts`:** `defineDurable("<slug>", …)` with the folder name. It imports only `@zapier/zapier-durable`, `@zapier/zapier-sdk`, `zod`, `./config.ts` and helpers in `./lib/`. Name each account by its alias as a string (`connection: "google-sheets"`). Keep `appKey`, `actionType` and `actionKey` string literals; Zapier's publish check rejects anything else. Check each action's keys and fields with `inspect_zapier_actions` before writing them.
 - **`config.ts`:** every value that differs per person is `"REPLACE_<NAME>"`, first in the file, with a same-line comment that starts with how to get it ("Ask the user…", "Look up with the user's … connection…"). Values the same for everyone are plain strings below. Never write a real ID, email address or webhook URL anywhere in the folder.
 - **`connections/<alias>.ts`:** `export default { app, description }`, one per account. The alias is the app's slug (`google-sheets`, `slack`), never its implementation key. Never add an `id`.
 - **`triggers/<event>.ts`:** a plain object with `app` (the slug), `event`, `connection` (the alias) and `params`. Check the event and field keys with `get_trigger_fields` first. A per-person trigger setting is a `"REPLACE_…"` value with the same kind of comment; a value also in `config.ts` uses the same `REPLACE_` name in both. A Zap that runs only on demand has no `triggers/` folder.
+- **`lib/<name>.ts`:** optional pure helpers `workflow.ts` imports as `./lib/<name>.ts`, with no SDK calls and no side effects. Use one only when a helper makes `workflow.ts` clearer; the zap's `SKILL.md` lists each file in its build steps, because it's published with `workflow.ts`.
 - **`SKILL.md`:** frontmatter `name: <slug>`, a `description` that says when to use it, `license: MIT`, and under `metadata`: `author`, a one-sentence `summary`, `apps` (only the apps it uses), `category`, `job`, and `source` when it came from a zapier.com page. Then these sections: the link to the folder on GitHub, What it does, Ask the user (a table of every `REPLACE_` value and where it lives), Build it, Test it (a sample input with no real data), Notes. Never say whether or how the zap was tested in the file; that goes in your report.
 - **`README.md`:** the summary, the apps, a "Based on" link when there's a source page, the Install section with "Build me this Zap, read how here: https://github.com/zapier/awesome-zaps/tree/main/zaps/<slug>", and the file list.
 
@@ -62,7 +63,7 @@ A draft run does real things in the user's apps.
 ### Tested mode
 
 1. Load Zapier's build guide with `get_zapier_skill("zapier:build-workflows")` and follow it up to the draft test, not past it.
-2. Create the workflow named "[install-test] <title>" (private), then a draft with `workflow.ts` and `config.ts` holding the test values (never write them back into the repo), the connections bound to the test accounts, and the trigger from `triggers/`.
+2. Create the workflow named "[install-test] <title>" (private), then a draft with `workflow.ts`, any `lib/` files, and `config.ts` holding the test values (never write them back into the repo), the connections bound to the test accounts, and the trigger from `triggers/`.
 3. Run the draft (`run_workflow_draft`) with the SKILL.md's sample input, at most **three** times, and only to find and fix bugs. Fix the file in `zaps/<slug>/`, update the draft, run again.
 4. Confirm the effect after the last run in the destination app: the row read back, the email seen, the message posted. If run-status tools are disabled, this check is the test.
 5. Leave the draft unpublished, and tell the user which "[install-test]" workflow to delete.

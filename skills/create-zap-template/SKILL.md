@@ -22,7 +22,7 @@ One source in, one zap folder out, ready for a pull request to [zapier/awesome-z
 
 **From a Zap the user already runs:** read it from their account. A workflow: `get_workflow`, and take `workflow.ts`, the trigger and the connections from its current version. A classic Zap: ask the user for its editor link, then `import_zap_to_workflow` with `private: true` and read the converted draft. Every ID in it belongs to the user; step 3 replaces each one.
 
-Name the folder after what the Zap does, in kebab-case without filler words: "Update missed appointment rows in your tracking sheet" becomes `update-missed-appointment-rows`. Check `zaps/<slug>/` doesn't exist yet.
+Name the folder after what the Zap does, verb first, in kebab-case without filler words: "Update missed appointment rows in your tracking sheet" becomes `update-missed-appointment-rows`. When the Zap is built around specific apps, name them as people search for them ("gmail", "google-sheets", "facebook-leads"), and keep the source page's key phrase ("daily sales report", "lead capture"): "Log new Gmail emails into Google Sheets for tracking and analysis" becomes `log-new-gmail-emails-to-google-sheets`. Keep it to about eight words. The folder name is permanent once merged, so check `zaps/<slug>/` doesn't exist yet. The `SKILL.md` `# title` is the source page's own title, word for word.
 
 ## 2. Pick connections for testing
 
